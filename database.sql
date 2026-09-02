@@ -49,20 +49,118 @@ CREATE TABLE IF NOT EXISTS `attempts` (
   PRIMARY KEY (`id`),
   KEY `user_id` (`user_id`),
   CONSTRAINT `attempts_ibfk_1` FOREIGN KEY (`user_id`) REFERENCES `users` (`id`) ON DELETE CASCADE
-) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
+) ENGINE=InnoDB AUTO_INCREMENT=3 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
 
 -- Data exporting was unselected.
+
+-- Dumping structure for procedure disc_test.CalculateDiscScores
+DELIMITER //
+CREATE PROCEDURE `CalculateDiscScores`(IN p_attempt_id INT)
+BEGIN
+    -- Semua DECLARE wajib berada di paling atas
+    DECLARE m_d, m_i, m_s, m_c INT DEFAULT 0;
+    DECLARE l_d, l_i, l_s, l_c INT DEFAULT 0;
+    DECLARE d_d, d_i, d_s, d_c INT DEFAULT 0;
+    DECLARE dom_type VARCHAR(10) DEFAULT 'D';
+    DECLARE max_score INT DEFAULT -999;
+
+    -- 1. Hitung total Most (mengabaikan '*')
+    SELECT 
+        COALESCE(SUM(CASE WHEN o_m.tipe_most = 'D' THEN 1 ELSE 0 END), 0),
+        COALESCE(SUM(CASE WHEN o_m.tipe_most = 'I' THEN 1 ELSE 0 END), 0),
+        COALESCE(SUM(CASE WHEN o_m.tipe_most = 'S' THEN 1 ELSE 0 END), 0),
+        COALESCE(SUM(CASE WHEN o_m.tipe_most = 'C' THEN 1 ELSE 0 END), 0)
+    INTO m_d, m_i, m_s, m_c
+    FROM answers a
+    JOIN options o_m ON a.most_option_id = o_m.id
+    WHERE a.attempt_id = p_attempt_id;
+
+    -- 2. Hitung total Least (mengabaikan '*')
+    SELECT 
+        COALESCE(SUM(CASE WHEN o_l.tipe_least = 'D' THEN 1 ELSE 0 END), 0),
+        COALESCE(SUM(CASE WHEN o_l.tipe_least = 'I' THEN 1 ELSE 0 END), 0),
+        COALESCE(SUM(CASE WHEN o_l.tipe_least = 'S' THEN 1 ELSE 0 END), 0),
+        COALESCE(SUM(CASE WHEN o_l.tipe_least = 'C' THEN 1 ELSE 0 END), 0)
+    INTO l_d, l_i, l_s, l_c
+    FROM answers a
+    JOIN options o_l ON a.least_option_id = o_l.id
+    WHERE a.attempt_id = p_attempt_id;
+
+    -- 3. Hitung Selisih (Graph 3: Most - Least)
+    SET d_d = m_d - l_d;
+    SET d_i = m_i - l_i;
+    SET d_s = m_s - l_s;
+    SET d_c = m_c - l_c;
+
+    -- 4. Tentukan tipe dominan berdasarkan selisih tertinggi
+    SET max_score = d_d;
+    SET dom_type = 'D';
+
+    IF d_i > max_score THEN
+        SET max_score = d_i;
+        SET dom_type = 'I';
+    END IF;
+
+    IF d_s > max_score THEN
+        SET max_score = d_s;
+        SET dom_type = 'S';
+    END IF;
+
+    IF d_c > max_score THEN
+        SET max_score = d_c;
+        SET dom_type = 'C';
+    END IF;
+
+    -- 5. Simpan / Perbarui ke tabel results
+    INSERT INTO results (
+        attempt_id,
+        raw_most_d, raw_most_i, raw_most_s, raw_most_c,
+        raw_least_d, raw_least_i, raw_least_s, raw_least_c,
+        diff_d, diff_i, diff_s, diff_c,
+        dominant_type
+    ) VALUES (
+        p_attempt_id,
+        m_d, m_i, m_s, m_c,
+        l_d, l_i, l_s, l_c,
+        d_d, d_i, d_s, d_c,
+        dom_type
+    )
+    ON DUPLICATE KEY UPDATE
+        raw_most_d = VALUES(raw_most_d),
+        raw_most_i = VALUES(raw_most_i),
+        raw_most_s = VALUES(raw_most_s),
+        raw_most_c = VALUES(raw_most_c),
+        raw_least_d = VALUES(raw_least_d),
+        raw_least_i = VALUES(raw_least_i),
+        raw_least_s = VALUES(raw_least_s),
+        raw_least_c = VALUES(raw_least_c),
+        diff_d = VALUES(diff_d),
+        diff_i = VALUES(diff_i),
+        diff_s = VALUES(diff_s),
+        diff_c = VALUES(diff_c),
+        dominant_type = VALUES(dominant_type);
+
+    -- 6. Ubah status attempt menjadi selesai
+    UPDATE attempts 
+    SET status = 'completed', completed_at = NOW() 
+    WHERE id = p_attempt_id;
+END//
+DELIMITER ;
 
 -- Dumping structure for table disc_test.options
 CREATE TABLE IF NOT EXISTS `options` (
   `id` int NOT NULL AUTO_INCREMENT,
   `question_id` int NOT NULL,
+  `option_order` int NOT NULL,
   `teks` text NOT NULL,
-  `tipe_disc` enum('D','I','S','C') NOT NULL,
+  `tipe_most` enum('D','I','S','C','*') NOT NULL,
+  `tipe_least` enum('D','I','S','C','*') NOT NULL,
+  `most_type` enum('D','I','S','C') NOT NULL,
+  `least_type` enum('D','I','S','C') NOT NULL,
   PRIMARY KEY (`id`),
   KEY `question_id` (`question_id`),
   CONSTRAINT `options_ibfk_1` FOREIGN KEY (`question_id`) REFERENCES `questions` (`id`) ON DELETE CASCADE
-) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
+) ENGINE=InnoDB AUTO_INCREMENT=97 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
 
 -- Data exporting was unselected.
 
@@ -72,7 +170,7 @@ CREATE TABLE IF NOT EXISTS `questions` (
   `nomor` int NOT NULL,
   `pertanyaan` text NOT NULL,
   PRIMARY KEY (`id`)
-) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
+) ENGINE=InnoDB AUTO_INCREMENT=25 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
 
 -- Data exporting was unselected.
 
@@ -89,7 +187,7 @@ CREATE TABLE IF NOT EXISTS `results` (
   PRIMARY KEY (`id`),
   KEY `attempt_id` (`attempt_id`),
   CONSTRAINT `results_ibfk_1` FOREIGN KEY (`attempt_id`) REFERENCES `attempts` (`id`) ON DELETE CASCADE
-) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
+) ENGINE=InnoDB AUTO_INCREMENT=3 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
 
 -- Data exporting was unselected.
 
@@ -103,7 +201,7 @@ CREATE TABLE IF NOT EXISTS `users` (
   `jenis_kelamin` enum('Laki-laki','Perempuan') DEFAULT NULL,
   `created_at` timestamp NULL DEFAULT CURRENT_TIMESTAMP,
   PRIMARY KEY (`id`)
-) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
+) ENGINE=InnoDB AUTO_INCREMENT=2 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
 
 -- Data exporting was unselected.
 
