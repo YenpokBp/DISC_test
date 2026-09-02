@@ -1,0 +1,360 @@
+<!doctype html>
+<html lang="id">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Pertanyaan Tes - DISC Test</title>
+
+    <!-- Tailwind CSS CDN -->
+    <script src="https://cdn.jsdelivr.net/npm/@tailwindcss/browser@4"></script>
+
+    <!-- Google Fonts: Plus Jakarta Sans -->
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link
+      href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800;900&display=swap"
+      rel="stylesheet"
+    />
+
+    <style>
+      body {
+        font-family: 'Plus Jakarta Sans', sans-serif;
+      }
+      .brand-purple {
+        color: #6D28D9;
+      }
+      .bg-brand-purple {
+        background-color: #6D28D9;
+      }
+      .bg-brand-purple:hover {
+        background-color: #5B21B6;
+      }
+    </style>
+  </head>
+
+  <body class="bg-slate-100 min-h-screen flex items-center justify-center p-0 sm:p-4 text-slate-800">
+    <!-- Main Mobile Container -->
+    <div
+      class="w-full max-w-sm min-h-screen sm:min-h-[660px] sm:h-auto bg-white sm:rounded-3xl shadow-xl sm:border sm:border-slate-100 px-6 py-6 flex flex-col justify-between"
+    >
+      <!-- Top Section -->
+      <div>
+        <!-- Header: Back Button & Progress Bar -->
+        <div class="flex items-center justify-between">
+          <button
+            id="btnBack"
+            aria-label="Kembali"
+            class="p-2 -ml-2 rounded-xl text-slate-700 hover:bg-slate-100 active:scale-95 transition"
+          >
+            <svg
+              class="w-6 h-6"
+              fill="none"
+              stroke="currentColor"
+              viewBox="0 0 24 24"
+              stroke-width="2"
+              stroke-linecap="round"
+              stroke-linejoin="round"
+            >
+              <path d="M19 12H5M12 19l-7-7 7-7" />
+            </svg>
+          </button>
+
+          <span
+            id="questionCounter"
+            class="text-xs font-bold text-purple-700 bg-purple-50 px-3 py-1 rounded-full border border-purple-100"
+          >
+            Pertanyaan 1 dari 24
+          </span>
+        </div>
+
+        <!-- Progress Bar Indicator -->
+        <div class="w-full bg-slate-100 h-1.5 rounded-full mt-4 overflow-hidden">
+          <div
+            id="progressBar"
+            class="bg-[#6D28D9] h-full rounded-full transition-all duration-300"
+            style="width: 4.16%"
+          ></div>
+        </div>
+
+        <!-- Question Title & Instruction -->
+        <div class="mt-6">
+          <div class="flex items-center gap-2">
+            <span class="text-xs font-bold text-slate-400 uppercase tracking-wide">Pilih Respon</span>
+          </div>
+          <h2
+            id="questionText"
+            class="text-lg sm:text-xl font-extrabold text-slate-900 mt-1 leading-snug"
+          >
+            1. Mengelola waktu dengan efisien
+          </h2>
+          <p class="text-xs text-slate-500 mt-1">
+            Pilih seberapa menggambarkan diri Anda pernyataan di atas:
+          </p>
+        </div>
+
+        <!-- Options Container (4 Skala: ++, +, -, --) -->
+        <div class="mt-6 space-y-3" id="optionsContainer">
+          <!-- Option: Sangat Sesuai (++) -->
+          <label
+            class="option-card flex items-center justify-between p-3.5 border-2 border-slate-200 hover:border-purple-300 rounded-2xl cursor-pointer transition-all duration-150 select-none group bg-white hover:bg-purple-50/30"
+          >
+            <div class="flex items-center gap-3">
+              <span
+                class="w-8 h-8 rounded-xl bg-purple-100 text-purple-700 font-extrabold text-xs flex items-center justify-center group-hover:bg-purple-700 group-hover:text-white transition"
+              >
+                ++
+              </span>
+              <span class="text-xs sm:text-sm font-semibold text-slate-700">Sangat Sesuai</span>
+            </div>
+            <input type="radio" name="disc_option" value="2" class="sr-only peer" />
+            <div
+              class="w-5 h-5 rounded-full border-2 border-slate-300 peer-checked:border-[#6D28D9] peer-checked:bg-[#6D28D9] flex items-center justify-center transition"
+            >
+              <div class="w-2 h-2 rounded-full bg-white hidden peer-checked:block"></div>
+            </div>
+          </label>
+
+          <!-- Option: Sesuai (+) -->
+          <label
+            class="option-card flex items-center justify-between p-3.5 border-2 border-slate-200 hover:border-purple-300 rounded-2xl cursor-pointer transition-all duration-150 select-none group bg-white hover:bg-purple-50/30"
+          >
+            <div class="flex items-center gap-3">
+              <span
+                class="w-8 h-8 rounded-xl bg-purple-100 text-purple-700 font-extrabold text-xs flex items-center justify-center group-hover:bg-purple-700 group-hover:text-white transition"
+              >
+                +
+              </span>
+              <span class="text-xs sm:text-sm font-semibold text-slate-700">Sesuai</span>
+            </div>
+            <input type="radio" name="disc_option" value="1" class="sr-only peer" />
+            <div
+              class="w-5 h-5 rounded-full border-2 border-slate-300 peer-checked:border-[#6D28D9] peer-checked:bg-[#6D28D9] flex items-center justify-center transition"
+            >
+              <div class="w-2 h-2 rounded-full bg-white hidden peer-checked:block"></div>
+            </div>
+          </label>
+
+          <!-- Option: Kurang Sesuai (-) -->
+          <label
+            class="option-card flex items-center justify-between p-3.5 border-2 border-slate-200 hover:border-purple-300 rounded-2xl cursor-pointer transition-all duration-150 select-none group bg-white hover:bg-purple-50/30"
+          >
+            <div class="flex items-center gap-3">
+              <span
+                class="w-8 h-8 rounded-xl bg-slate-100 text-slate-600 font-extrabold text-xs flex items-center justify-center group-hover:bg-purple-700 group-hover:text-white transition"
+              >
+                -
+              </span>
+              <span class="text-xs sm:text-sm font-semibold text-slate-700">Kurang Sesuai</span>
+            </div>
+            <input type="radio" name="disc_option" value="-1" class="sr-only peer" />
+            <div
+              class="w-5 h-5 rounded-full border-2 border-slate-300 peer-checked:border-[#6D28D9] peer-checked:bg-[#6D28D9] flex items-center justify-center transition"
+            >
+              <div class="w-2 h-2 rounded-full bg-white hidden peer-checked:block"></div>
+            </div>
+          </label>
+
+          <!-- Option: Sangat Tidak Sesuai (--) -->
+          <label
+            class="option-card flex items-center justify-between p-3.5 border-2 border-slate-200 hover:border-purple-300 rounded-2xl cursor-pointer transition-all duration-150 select-none group bg-white hover:bg-purple-50/30"
+          >
+            <div class="flex items-center gap-3">
+              <span
+                class="w-8 h-8 rounded-xl bg-slate-100 text-slate-600 font-extrabold text-xs flex items-center justify-center group-hover:bg-purple-700 group-hover:text-white transition"
+              >
+                --
+              </span>
+              <span class="text-xs sm:text-sm font-semibold text-slate-700">Tidak Sesuai</span>
+            </div>
+            <input type="radio" name="disc_option" value="-2" class="sr-only peer" />
+            <div
+              class="w-5 h-5 rounded-full border-2 border-slate-300 peer-checked:border-[#6D28D9] peer-checked:bg-[#6D28D9] flex items-center justify-center transition"
+            >
+              <div class="w-2 h-2 rounded-full bg-white hidden peer-checked:block"></div>
+            </div>
+          </label>
+        </div>
+      </div>
+
+      <!-- Bottom Action Section -->
+      <div class="pt-6 pb-2">
+        <button
+          type="button"
+          id="btnNext"
+          class="w-full bg-[#6D28D9] hover:bg-[#5B21B6] text-white font-bold py-3.5 px-6 rounded-xl shadow-lg shadow-purple-200 transition-all duration-200 active:scale-[0.98] flex items-center justify-center text-center cursor-pointer"
+        >
+          Selanjutnya
+        </button>
+      </div>
+    </div>
+
+    <!-- Alert / Toast Modal -->
+    <div
+      id="toastAlert"
+      class="fixed bottom-6 inset-x-4 max-w-sm mx-auto bg-slate-900 text-white text-xs px-4 py-3 rounded-xl shadow-xl flex items-center gap-3 transform translate-y-20 opacity-0 transition-all duration-300 pointer-events-none z-50"
+    >
+      <span>⚠️</span>
+      <span id="toastMsg">Silakan pilih salah satu jawaban terlebih dahulu.</span>
+    </div>
+
+    <!-- Script Data Soal & Logika Tes -->
+    <script>
+      // 24 Soal DISC sesuai referensi & panduan di foto mockup
+      const questions = [
+        { id: 1, text: "Mengelola waktu dengan efisien", dimension: "D" },
+        { id: 2, text: "Penyemangat / pendukung yang baik", dimension: "I" },
+        { id: 3, text: "Non konfrontasi / mengalah", dimension: "S" },
+        { id: 4, text: "Ramah, mudah berteman", dimension: "I" },
+        { id: 5, text: "Menolak perubahan yang mendadak", dimension: "S" },
+        { id: 6, text: "Pendengar yang sabar dan tenang", dimension: "S" },
+        { id: 7, text: "Cepat mengambil keputusan tegas", dimension: "D" },
+        { id: 8, text: "Suka mengoreksi dan mengecek detail", dimension: "C" },
+        { id: 9, text: "Optimis dan penuh energi positif", dimension: "I" },
+        { id: 10, text: "Berorientasi kuat pada target & hasil", dimension: "D" },
+        { id: 11, text: "Suka stabilitas dan rutinitas teratur", dimension: "S" },
+        { id: 12, text: "Mementingkan hasil akhir di atas segalanya", dimension: "D" },
+        { id: 13, text: "Suka berbicara dan meyakinkan orang lain", dimension: "I" },
+        { id: 14, text: "Setia kawan dan cinta kedamaian", dimension: "S" },
+        { id: 15, text: "Menyukai tantangan kompetitif", dimension: "D" },
+        { id: 16, text: "Menghindari perselisihan secara terbuka", dimension: "S" },
+        { id: 17, text: "Bekerja secara sistematis dan analitis", dimension: "C" },
+        { id: 18, text: "Percaya diri dan berani memimpin", dimension: "D" },
+        { id: 19, text: "Sabar membimbing orang lain selangkah demi selangkah", dimension: "S" },
+        { id: 20, text: "Berani mengambil risiko tinggi", dimension: "D" },
+        { id: 21, text: "Spontan, ekspresif, dan ceria", dimension: "I" },
+        { id: 22, text: "Konsisten dan tidak mudah berubah pikiran", dimension: "S" },
+        { id: 23, text: "Tegas terhadap kelemahan atau kesalahan", dimension: "D" },
+        { id: 24, text: "Mengikuti aturan baku dan prosedur yang jelas", dimension: "C" }
+      ];
+
+      let currentIndex = 0;
+      let answers = {};
+
+      const questionCounter = document.getElementById('questionCounter');
+      const progressBar = document.getElementById('progressBar');
+      const questionText = document.getElementById('questionText');
+      const optionsContainer = document.getElementById('optionsContainer');
+      const btnNext = document.getElementById('btnNext');
+      const btnBack = document.getElementById('btnBack');
+      const toastAlert = document.getElementById('toastAlert');
+      const toastMsg = document.getElementById('toastMsg');
+
+      // Load existing answers if any
+      try {
+        const savedAnswers = localStorage.getItem('disc_answers');
+        if (savedAnswers) {
+          answers = JSON.parse(savedAnswers);
+        }
+      } catch (e) {}
+
+      function showToast(msg) {
+        toastMsg.textContent = msg;
+        toastAlert.classList.remove('translate-y-20', 'opacity-0');
+        setTimeout(() => {
+          toastAlert.classList.add('translate-y-20', 'opacity-0');
+        }, 2500);
+      }
+
+      function updateCardStyles() {
+        const optionCards = document.querySelectorAll('.option-card');
+        optionCards.forEach((card) => {
+          const radio = card.querySelector('input[type="radio"]');
+          if (radio && radio.checked) {
+            card.classList.add('border-[#6D28D9]', 'bg-purple-50/40');
+            card.classList.remove('border-slate-200', 'bg-white');
+          } else {
+            card.classList.remove('border-[#6D28D9]', 'bg-purple-50/40');
+            card.classList.add('border-slate-200', 'bg-white');
+          }
+        });
+      }
+
+      function renderQuestion(index) {
+        const q = questions[index];
+        questionCounter.textContent = `Pertanyaan ${index + 1} dari ${questions.length}`;
+        const progressPct = ((index + 1) / questions.length) * 100;
+        progressBar.style.width = `${progressPct}%`;
+
+        questionText.textContent = `${index + 1}. ${q.text}`;
+
+        // Reset radio selection
+        const radios = document.querySelectorAll('input[name="disc_option"]');
+        radios.forEach((r) => {
+          r.checked = false;
+        });
+
+        // If previously answered, check it
+        if (answers[q.id] !== undefined) {
+          const val = answers[q.id].value;
+          const matchingRadio = document.querySelector(`input[name="disc_option"][value="${val}"]`);
+          if (matchingRadio) {
+            matchingRadio.checked = true;
+          }
+        }
+
+        updateCardStyles();
+
+        // Change button text on last question
+        if (index === questions.length - 1) {
+          btnNext.textContent = 'Review Jawaban';
+        } else {
+          btnNext.textContent = 'Selanjutnya';
+        }
+      }
+
+      // Add click listener to option cards
+      document.querySelectorAll('.option-card').forEach((card) => {
+        card.addEventListener('click', () => {
+          const radio = card.querySelector('input[type="radio"]');
+          if (radio) {
+            radio.checked = true;
+            updateCardStyles();
+          }
+        });
+      });
+
+      // Handle Back Button
+      btnBack.addEventListener('click', () => {
+        if (currentIndex > 0) {
+          currentIndex--;
+          renderQuestion(currentIndex);
+        } else {
+          window.location.href = 'data-diri.html';
+        }
+      });
+
+      // Handle Next Button
+      btnNext.addEventListener('click', () => {
+        const checkedRadio = document.querySelector('input[name="disc_option"]:checked');
+        if (!checkedRadio) {
+          showToast('Silakan pilih salah satu jawaban terlebih dahulu.');
+          return;
+        }
+
+        const currentQ = questions[currentIndex];
+        answers[currentQ.id] = {
+          order: currentQ.id,
+          text: currentQ.text,
+          dimension: currentQ.dimension,
+          value: parseInt(checkedRadio.value, 10)
+        };
+
+        // Save answers in localStorage
+        try {
+          localStorage.setItem('disc_answers', JSON.stringify(answers));
+        } catch (e) {}
+
+        if (currentIndex < questions.length - 1) {
+          currentIndex++;
+          renderQuestion(currentIndex);
+        } else {
+          // Go to review page
+          window.location.href = 'review.html';
+        }
+      });
+
+      // Initial render
+      renderQuestion(currentIndex);
+    </script>
+  </body>
+</html>
